@@ -3,442 +3,279 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zephyris Admin — Dashboard</title>
+<title>Zephyris Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',-apple-system,sans-serif}
+  *{margin:0;padding:0;box-sizing:border-box}
   :root{
-    --bg:#0a0b10;
-    --bg-2:#11131c;
-    --card:#151824;
-    --border:#22263a;
-    --border-2:#2c3149;
-    --text:#e8eaf2;
-    --text-2:#8b90a8;
-    --text-3:#5a5f78;
-    --primary:#6366f1;
-    --primary-2:#8b5cf6;
-    --green:#22c55e;
-    --red:#ef4444;
-    --yellow:#eab308;
-    --blue:#3b82f6;
+    --bg:#0b0c0f;
+    --surface:#111318;
+    --surface-2:#171a21;
+    --line:#1f232c;
+    --line-2:#2a2f3b;
+    --text:#e6e8ee;
+    --muted:#8a90a0;
+    --faint:#5b6171;
+    --accent:#5b8def;
+    --accent-h:#4a7be0;
+    --ok:#3ecf8e;
+    --err:#f0616d;
+    --warn:#e5a93c;
+    --r:10px;
   }
-  body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);
+    color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased}
+  button,input,select{font-family:inherit;font-size:inherit;color:inherit}
+  svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
   ::-webkit-scrollbar{width:8px;height:8px}
-  ::-webkit-scrollbar-track{background:var(--bg)}
-  ::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:4px}
-  ::-webkit-scrollbar-thumb:hover{background:#3d4260}
+  ::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:4px}
 
-  /* ============ LOGIN ============ */
-  #loginScreen{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:20px;
-    background:radial-gradient(circle at 20% 20%,rgba(99,102,241,.15),transparent 50%),
-               radial-gradient(circle at 80% 80%,rgba(139,92,246,.12),transparent 50%),var(--bg)}
+  /* ---------- buttons / inputs ---------- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 14px;
+    border-radius:8px;border:1px solid var(--line-2);background:var(--surface-2);cursor:pointer;
+    font-weight:500;transition:background .15s,border-color .15s}
+  .btn:hover{background:#1d212a;border-color:#363c4a}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn-primary:hover{background:var(--accent-h);border-color:var(--accent-h)}
+  .field{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .field label{font-size:12px;color:var(--muted);font-weight:500}
+  .input{height:36px;width:100%;padding:0 12px;background:var(--bg);border:1px solid var(--line-2);
+    border-radius:8px;outline:none;transition:border-color .15s,box-shadow .15s}
+  .input::placeholder{color:var(--faint)}
+  .input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(91,141,239,.15)}
+  select.input{appearance:none;cursor:pointer;padding-right:30px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a90a0' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 10px center}
+
+  /* ---------- login ---------- */
+  #loginScreen{position:fixed;inset:0;display:grid;place-items:center;padding:20px;background:var(--bg);z-index:100}
   #loginScreen.hide{display:none}
-  .login-box{width:100%;max-width:420px;background:rgba(21,24,36,.85);backdrop-filter:blur(20px);
-    border:1px solid var(--border);border-radius:20px;padding:40px 32px;
-    box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(99,102,241,.1) inset}
-  .login-logo{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--primary),var(--primary-2));
-    display:grid;place-items:center;margin:0 auto 20px;box-shadow:0 12px 30px rgba(99,102,241,.4)}
-  .login-logo svg{width:32px;height:32px;stroke:#fff;fill:none;stroke-width:2}
-  .login-box h1{font-size:24px;font-weight:800;text-align:center;margin-bottom:8px;letter-spacing:-.5px}
-  .login-box .sub{color:var(--text-2);font-size:14px;text-align:center;margin-bottom:32px}
-  .login-field{margin-bottom:16px}
-  .login-field label{display:block;font-size:13px;color:var(--text-2);margin-bottom:8px;font-weight:500}
-  .login-field input{width:100%;padding:14px 16px;background:var(--bg-2);border:1px solid var(--border);
-    border-radius:12px;color:var(--text);font-size:14px;outline:none;transition:.2s;font-weight:500}
-  .login-field input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
-  .login-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--primary),var(--primary-2));
-    color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;
-    transition:.2s;margin-top:8px;letter-spacing:.2px}
-  .login-btn:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(99,102,241,.4)}
-  .login-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-  .login-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;
-    padding:12px;border-radius:10px;font-size:13px;margin-top:16px;text-align:center;display:none}
+  .login{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--line);
+    border-radius:14px;padding:32px 28px}
+  .login .mark{width:36px;height:36px;border-radius:9px;background:var(--accent);display:grid;place-items:center;margin-bottom:20px}
+  .login .mark svg{width:18px;height:18px;stroke:#fff}
+  .login h1{font-size:18px;font-weight:600;letter-spacing:-.2px}
+  .login p{color:var(--muted);margin:4px 0 24px}
+  .login .btn{width:100%;margin-top:14px;height:40px}
+  .login-error{display:none;margin-top:14px;font-size:13px;color:var(--err)}
   .login-error.show{display:block}
 
-  /* ============ LAYOUT ============ */
-  #app{display:none;min-height:100vh}
-  #app.show{display:grid;grid-template-columns:260px 1fr;grid-template-rows:auto 1fr}
+  /* ---------- app ---------- */
+  #app{display:none}
+  #app.show{display:block}
+  .topbar{position:sticky;top:0;z-index:20;background:rgba(11,12,15,.85);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line)}
+  .topbar-in{max-width:1200px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px}
+  .brand .mark{width:28px;height:28px;border-radius:7px;background:var(--accent);display:grid;place-items:center}
+  .brand .mark svg{width:15px;height:15px;stroke:#fff}
+  .brand small{color:var(--faint);font-weight:500;font-size:12px;margin-left:2px}
+  .top-actions{display:flex;gap:8px}
+  .wrap{max-width:1200px;margin:0 auto;padding:28px 24px 64px}
 
-  /* SIDEBAR */
-  .sidebar{grid-row:1/-1;background:var(--bg-2);border-right:1px solid var(--border);
-    padding:24px 16px;position:sticky;top:0;height:100vh;overflow-y:auto}
-  .sidebar-brand{display:flex;align-items:center;gap:12px;padding:0 12px 24px;margin-bottom:16px;
-    border-bottom:1px solid var(--border)}
-  .sidebar-brand-logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--primary),var(--primary-2));
-    display:grid;place-items:center;flex-shrink:0}
-  .sidebar-brand-logo svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2}
-  .sidebar-brand-text{font-weight:800;font-size:15px;letter-spacing:-.3px}
-  .sidebar-brand-text span{display:block;font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.5px;margin-top:2px}
-  .nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;
-    color:var(--text-2);font-size:14px;font-weight:500;cursor:pointer;transition:.15s;margin-bottom:4px;
-    text-decoration:none}
-  .nav-item:hover{background:rgba(99,102,241,.08);color:var(--text)}
-  .nav-item.active{background:linear-gradient(135deg,rgba(99,102,241,.2),rgba(139,92,246,.15));
-    color:var(--text);font-weight:600;border:1px solid rgba(99,102,241,.3)}
-  .nav-item svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0}
-  .nav-section{font-size:11px;color:var(--text-3);font-weight:600;letter-spacing:1px;
-    padding:16px 14px 8px;text-transform:uppercase}
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+  .stat .l{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px}
+  .stat .l i{width:7px;height:7px;border-radius:50%;background:var(--faint);display:inline-block}
+  .stat.ok .l i{background:var(--ok)} .stat.err .l i{background:var(--err)} .stat.warn .l i{background:var(--warn)}
+  .stat .v{font-size:26px;font-weight:600;letter-spacing:-.6px;margin-top:6px;font-variant-numeric:tabular-nums}
 
-  /* HEADER */
-  .header{grid-column:2;background:var(--bg-2);border-bottom:1px solid var(--border);
-    padding:16px 28px;display:flex;align-items:center;justify-content:space-between;
-    position:sticky;top:0;z-index:50}
-  .header-title h2{font-size:20px;font-weight:800;letter-spacing:-.5px}
-  .header-title p{font-size:13px;color:var(--text-2);margin-top:2px}
-  .header-actions{display:flex;gap:10px;align-items:center}
-  .btn{padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;
-    transition:.15s;border:1px solid transparent;display:inline-flex;align-items:center;gap:8px;
-    font-family:inherit}
-  .btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
-  .btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff}
-  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(99,102,241,.4)}
-  .btn-ghost{background:var(--card);color:var(--text-2);border-color:var(--border)}
-  .btn-ghost:hover{border-color:var(--border-2);color:var(--text)}
-  .btn-danger{background:rgba(239,68,68,.1);color:#fca5a5;border-color:rgba(239,68,68,.3)}
-  .btn-danger:hover{background:rgba(239,68,68,.2)}
-  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-  .btn-sm{padding:7px 12px;font-size:12px}
+  /* panels */
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:20px}
+  .panel-h{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .panel-h h3{font-size:14px;font-weight:600}
+  .panel-h .count{font-size:12px;color:var(--muted)}
+  .create{padding:20px;display:grid;grid-template-columns:160px 1fr 140px auto;gap:14px;align-items:end}
 
-  /* MAIN */
-  .main{grid-column:2;padding:28px;max-width:1400px;width:100%}
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
-  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;
-    position:relative;overflow:hidden;transition:.2s}
-  .stat-card:hover{border-color:var(--border-2);transform:translateY(-2px)}
-  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
-    background:linear-gradient(90deg,var(--primary),var(--primary-2));opacity:.6}
-  .stat-card.green::before{background:linear-gradient(90deg,#22c55e,#4ade80)}
-  .stat-card.red::before{background:linear-gradient(90deg,#ef4444,#f87171)}
-  .stat-card.yellow::before{background:linear-gradient(90deg,#eab308,#facc15)}
-  .stat-icon{width:38px;height:38px;border-radius:10px;background:rgba(99,102,241,.12);
-    display:grid;place-items:center;margin-bottom:14px}
-  .stat-icon svg{width:18px;height:18px;stroke:var(--primary);fill:none;stroke-width:2}
-  .stat-card.green .stat-icon{background:rgba(34,197,94,.12)}
-  .stat-card.green .stat-icon svg{stroke:#22c55e}
-  .stat-card.red .stat-icon{background:rgba(239,68,68,.12)}
-  .stat-card.red .stat-icon svg{stroke:#ef4444}
-  .stat-card.yellow .stat-icon{background:rgba(234,179,8,.12)}
-  .stat-card.yellow .stat-icon svg{stroke:#eab308}
-  .stat-label{font-size:12px;color:var(--text-2);font-weight:500;letter-spacing:.3px;text-transform:uppercase}
-  .stat-value{font-size:28px;font-weight:800;margin-top:6px;letter-spacing:-1px}
+  .toolbar{display:flex;gap:10px;padding:14px 20px;border-bottom:1px solid var(--line)}
+  .search{position:relative;flex:1;min-width:0}
+  .search svg{position:absolute;left:12px;top:10px;color:var(--faint);pointer-events:none}
+  .search .input{padding-left:34px}
+  .toolbar select{width:180px}
 
-  /* CARD */
-  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-  .card-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;
-    align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-  .card-header h3{font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px}
-  .card-header h3 svg{width:18px;height:18px;stroke:var(--primary);fill:none;stroke-width:2}
-  .card-body{padding:24px}
-
-  /* FORM */
-  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px}
-  .form-group label{display:block;font-size:12px;color:var(--text-2);font-weight:600;
-    margin-bottom:8px;letter-spacing:.3px;text-transform:uppercase}
-  .form-group input,.form-group select{width:100%;padding:12px 14px;background:var(--bg-2);
-    border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;
-    outline:none;transition:.15s;font-family:inherit;font-weight:500}
-  .form-group input:focus,.form-group select:focus{border-color:var(--primary);
-    box-shadow:0 0 0 3px rgba(99,102,241,.12)}
-  .form-group input::placeholder{color:var(--text-3)}
-
-  /* TABLE */
-  .table-wrap{overflow-x:auto}
-  table{width:100%;border-collapse:collapse;font-size:14px}
-  thead{background:var(--bg-2)}
-  th{padding:14px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-2);
-    letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap}
-  td{padding:16px;border-bottom:1px solid var(--border);vertical-align:middle}
-  tbody tr{transition:.15s}
-  tbody tr:hover{background:rgba(99,102,241,.04)}
+  /* table */
+  .tw{overflow-x:auto}
+  table{width:100%;border-collapse:collapse}
+  th{padding:10px 20px;text-align:left;font-size:12px;font-weight:500;color:var(--muted);
+    border-bottom:1px solid var(--line);white-space:nowrap;background:var(--surface)}
+  td{padding:12px 20px;border-bottom:1px solid var(--line);vertical-align:middle;white-space:nowrap}
   tbody tr:last-child td{border-bottom:none}
-  .key-code{font-family:'JetBrains Mono','Courier New',monospace;font-size:13px;
-    background:var(--bg-2);padding:6px 10px;border-radius:8px;border:1px solid var(--border);
-    color:#a5b4fc;font-weight:600;letter-spacing:.5px;display:inline-block}
-  .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;
-    font-size:11px;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+  tbody tr:hover{background:rgba(255,255,255,.015)}
+  td.sub{color:var(--muted)}
+  .key{font-family:'JetBrains Mono',ui-monospace,Consolas,monospace;font-size:13px;color:var(--text);
+    display:inline-flex;align-items:center;gap:8px;cursor:pointer;padding:3px 0;background:none;border:none}
+  .key svg{width:13px;height:13px;color:var(--faint);opacity:0;transition:opacity .15s}
+  .key:hover svg{opacity:1}
+  .note{max-width:260px;overflow:hidden;text-overflow:ellipsis}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:3px 9px;border-radius:999px;border:1px solid}
   .badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
-  .badge-active{background:rgba(34,197,94,.12);color:#4ade80}
-  .badge-locked{background:rgba(239,68,68,.12);color:#f87171}
-  .badge-expired{background:rgba(234,179,8,.12);color:#facc15}
-  .badge-lifetime{background:rgba(99,102,241,.12);color:#a5b4fc}
-  .action-btns{display:flex;gap:6px}
-  .icon-btn{width:32px;height:32px;border-radius:8px;background:var(--bg-2);border:1px solid var(--border);
-    display:grid;place-items:center;cursor:pointer;transition:.15s}
-  .icon-btn svg{width:14px;height:14px;stroke:var(--text-2);fill:none;stroke-width:2}
-  .icon-btn:hover{border-color:var(--border-2);background:var(--card)}
-  .icon-btn.danger:hover{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.08)}
-  .icon-btn.danger:hover svg{stroke:#f87171}
+  .b-active{color:var(--ok);border-color:rgba(62,207,142,.25);background:rgba(62,207,142,.08)}
+  .b-locked{color:var(--err);border-color:rgba(240,97,109,.25);background:rgba(240,97,109,.08)}
+  .b-expired{color:var(--warn);border-color:rgba(229,169,60,.25);background:rgba(229,169,60,.08)}
+  .acts{display:flex;gap:4px;justify-content:flex-end}
+  .ib{width:30px;height:30px;display:grid;place-items:center;border-radius:7px;border:1px solid transparent;
+    background:none;color:var(--muted);cursor:pointer;transition:.15s}
+  .ib:hover{background:var(--surface-2);border-color:var(--line-2);color:var(--text)}
+  .ib.del:hover{color:var(--err);border-color:rgba(240,97,109,.3);background:rgba(240,97,109,.08)}
+  .empty{padding:56px 20px;text-align:center;color:var(--muted)}
+  .empty b{display:block;color:var(--text);font-weight:600;margin-bottom:4px}
 
-  /* TOOLBAR */
-  .toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:16px 24px;
-    border-bottom:1px solid var(--border);background:var(--bg-2)}
-  .search-box{flex:1;min-width:200px;position:relative}
-  .search-box svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);
-    width:16px;height:16px;stroke:var(--text-3);fill:none;stroke-width:2;pointer-events:none}
-  .search-box input{width:100%;padding:10px 14px 10px 40px;background:var(--card);
-    border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;
-    outline:none;transition:.15s;font-family:inherit}
-  .search-box input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
-
-  /* EMPTY */
-  .empty{text-align:center;padding:60px 20px;color:var(--text-2)}
-  .empty svg{width:64px;height:64px;stroke:var(--text-3);fill:none;stroke-width:1.5;margin-bottom:16px}
-  .empty h4{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
-  .empty p{font-size:13px}
-
-  /* TOAST */
-  .toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);
-    padding:14px 20px;border-radius:12px;font-size:14px;font-weight:500;display:flex;
-    align-items:center;gap:10px;transform:translateX(400px);transition:.3s cubic-bezier(.4,0,.2,1);
-    box-shadow:0 20px 50px rgba(0,0,0,.5);z-index:2000;max-width:360px}
-  .toast.show{transform:translateX(0)}
-  .toast.success{border-color:rgba(34,197,94,.4)}
-  .toast.success::before{content:'';width:8px;height:8px;border-radius:50%;background:#22c55e;
-    box-shadow:0 0 12px #22c55e;flex-shrink:0}
-  .toast.error{border-color:rgba(239,68,68,.4)}
-  .toast.error::before{content:'';width:8px;height:8px;border-radius:50%;background:#ef4444;
-    box-shadow:0 0 12px #ef4444;flex-shrink:0}
-
-  /* MOBILE */
-  .mobile-menu-btn{display:none;background:var(--card);border:1px solid var(--border);
-    width:38px;height:38px;border-radius:10px;cursor:pointer;place-items:center}
-  .mobile-menu-btn svg{width:18px;height:18px;stroke:var(--text);fill:none;stroke-width:2}
+  /* toast */
+  .toast{position:fixed;bottom:20px;right:20px;background:var(--surface-2);border:1px solid var(--line-2);
+    padding:11px 16px;border-radius:9px;font-size:13px;display:flex;align-items:center;gap:10px;
+    transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s;z-index:200;
+    box-shadow:0 12px 32px rgba(0,0,0,.45)}
+  .toast.show{transform:none;opacity:1}
+  .toast::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--ok)}
+  .toast.error::before{background:var(--err)}
 
   @media(max-width:900px){
-    #app.show{grid-template-columns:1fr}
-    .sidebar{position:fixed;left:-280px;width:260px;z-index:200;transition:.3s;height:100vh}
-    .sidebar.open{left:0}
-    .header{grid-column:1;padding:14px 16px}
-    .main{grid-column:1;padding:16px}
-    .mobile-menu-btn{display:grid}
-    .header-title h2{font-size:17px}
-    .header-title p{display:none}
-    .stat-value{font-size:22px}
-    .toast{left:16px;right:16px;bottom:16px;max-width:none}
-    .toast.show{transform:translateX(0)}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .create{grid-template-columns:1fr 1fr}
+    .create .field:nth-child(2){grid-column:1/-1;order:3}
+    .create .btn{grid-column:1/-1;order:4}
+  }
+  @media(max-width:560px){
+    .topbar-in,.wrap{padding-left:16px;padding-right:16px}
+    .toolbar{flex-direction:column}
+    .toolbar select{width:100%}
+    th,td{padding-left:14px;padding-right:14px}
+    .toast{left:16px;right:16px;bottom:16px}
+    .brand small{display:none}
   }
 </style>
 </head>
 <body>
 
-<!-- ============ LOGIN ============ -->
+<!-- LOGIN -->
 <div id="loginScreen">
-  <div class="login-box">
-    <div class="login-logo">
-      <svg viewBox="0 0 24 24"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z"/><path d="M9 12l2 2 4-4"/></svg>
-    </div>
+  <form class="login" id="loginForm" onsubmit="return false">
+    <div class="mark"><svg viewBox="0 0 24 24"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z"/></svg></div>
     <h1>Zephyris Admin</h1>
-    <p class="sub">Đăng nhập để quản lý hệ thống Key</p>
-    <div class="login-field">
-      <label>Mật khẩu Admin</label>
-      <input id="password" type="password" placeholder="Nhập mật khẩu..." autocomplete="current-password">
+    <p>Đăng nhập để quản lý Key</p>
+    <div class="field">
+      <label for="password">Mật khẩu</label>
+      <input id="password" class="input" type="password" placeholder="Nhập mật khẩu" autocomplete="current-password" autofocus>
     </div>
-    <button class="login-btn" id="loginBtn">Đăng nhập</button>
+    <button class="btn btn-primary" id="loginBtn" type="submit">Đăng nhập</button>
     <div class="login-error" id="loginError">Mật khẩu không chính xác</div>
-  </div>
+  </form>
 </div>
 
-<!-- ============ APP ============ -->
+<!-- APP -->
 <div id="app">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-      <div class="sidebar-brand-logo">
-        <svg viewBox="0 0 24 24"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z"/><path d="M9 12l2 2 4-4"/></svg>
+  <header class="topbar">
+    <div class="topbar-in">
+      <div class="brand">
+        <div class="mark"><svg viewBox="0 0 24 24"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z"/></svg></div>
+        Zephyris <small>Admin</small>
       </div>
-      <div class="sidebar-brand-text">
-        Zephyris
-        <span>ADMIN PANEL</span>
-      </div>
-    </div>
-
-    <div class="nav-section">Quản lý</div>
-    <a class="nav-item active" href="#">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-      Dashboard
-    </a>
-    <a class="nav-item" href="#">
-      <svg viewBox="0 0 24 24"><path d="M15 7a4 4 0 1 1-5.66 5.66L4 18v3h3l5.34-5.34A4 4 0 0 0 17 11"/><circle cx="16" cy="8" r="1"/></svg>
-      Quản lý Key
-    </a>
-    <a class="nav-item" href="#">
-      <svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>
-      Thống kê
-    </a>
-
-    <div class="nav-section">Hệ thống</div>
-    <a class="nav-item" href="#" onclick="logout()">
-      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-      Đăng xuất
-    </a>
-  </aside>
-
-  <!-- HEADER -->
-  <header class="header">
-    <div style="display:flex;align-items:center;gap:12px">
-      <button class="mobile-menu-btn" onclick="toggleSidebar()">
-        <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-      </button>
-      <div class="header-title">
-        <h2>Dashboard</h2>
-        <p>Tổng quan hệ thống quản lý Key</p>
-      </div>
-    </div>
-    <div class="header-actions">
-      <button class="btn btn-ghost btn-sm" onclick="loadKeys()">
-        <svg viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-        Làm mới
-      </button>
-    </div>
-  </header>
-
-  <!-- MAIN -->
-  <main class="main">
-
-    <!-- STATS -->
-    <div class="stats">
-      <div class="stat-card">
-        <div class="stat-icon">
-          <svg viewBox="0 0 24 24"><path d="M15 7a4 4 0 1 1-5.66 5.66L4 18v3h3l5.34-5.34A4 4 0 0 0 17 11"/></svg>
-        </div>
-        <div class="stat-label">Tổng Key</div>
-        <div class="stat-value" id="statTotal">0</div>
-      </div>
-      <div class="stat-card green">
-        <div class="stat-icon">
-          <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-        </div>
-        <div class="stat-label">Đang hoạt động</div>
-        <div class="stat-value" id="statActive">0</div>
-      </div>
-      <div class="stat-card red">
-        <div class="stat-icon">
-          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        </div>
-        <div class="stat-label">Đã khóa</div>
-        <div class="stat-value" id="statLocked">0</div>
-      </div>
-      <div class="stat-card yellow">
-        <div class="stat-icon">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        </div>
-        <div class="stat-label">Hết hạn</div>
-        <div class="stat-value" id="statExpired">0</div>
-      </div>
-    </div>
-
-    <!-- CREATE KEY -->
-    <div class="card" style="margin-bottom:24px">
-      <div class="card-header">
-        <h3>
-          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-          Tạo Key mới
-        </h3>
-      </div>
-      <div class="card-body">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Thời gian</label>
-            <select id="duration">
-              <option value="1">1 ngày</option>
-              <option value="7" selected>7 ngày</option>
-              <option value="30">30 ngày</option>
-              <option value="365">1 năm</option>
-              <option value="0">Vĩnh viễn</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Ghi chú / Thiết bị</label>
-            <input id="device" type="text" placeholder="VD: Khách A - Zalo 0336...">
-          </div>
-          <div class="form-group">
-            <label>Số lượng</label>
-            <select id="quantity">
-              <option value="1">1 Key</option>
-              <option value="5">5 Key</option>
-              <option value="10">10 Key</option>
-              <option value="20">20 Key</option>
-              <option value="50">50 Key</option>
-            </select>
-          </div>
-        </div>
-        <button class="btn btn-primary" id="createBtn" style="width:100%;padding:13px">
-          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-          Tạo Key ngay
+      <div class="top-actions">
+        <button class="btn" onclick="loadKeys()" id="refreshBtn">
+          <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+          Làm mới
+        </button>
+        <button class="btn" onclick="logout()">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+          Đăng xuất
         </button>
       </div>
     </div>
+  </header>
 
-    <!-- KEY LIST -->
-    <div class="card">
-      <div class="card-header">
-        <h3>
-          <svg viewBox="0 0 24 24"><path d="M15 7a4 4 0 1 1-5.66 5.66L4 18v3h3l5.34-5.34A4 4 0 0 0 17 11"/></svg>
-          Danh sách Key
-        </h3>
-        <span class="badge badge-active" id="listCount">0 KEY</span>
+  <main class="wrap">
+    <section class="stats">
+      <div class="stat"><div class="l"><i></i>Tổng Key</div><div class="v" id="statTotal">0</div></div>
+      <div class="stat ok"><div class="l"><i></i>Hoạt động</div><div class="v" id="statActive">0</div></div>
+      <div class="stat err"><div class="l"><i></i>Đã khóa</div><div class="v" id="statLocked">0</div></div>
+      <div class="stat warn"><div class="l"><i></i>Hết hạn</div><div class="v" id="statExpired">0</div></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h"><h3>Tạo Key mới</h3></div>
+      <div class="create">
+        <div class="field">
+          <label for="duration">Thời hạn</label>
+          <select id="duration" class="input">
+            <option value="1">1 ngày</option>
+            <option value="7" selected>7 ngày</option>
+            <option value="30">30 ngày</option>
+            <option value="365">1 năm</option>
+            <option value="0">Vĩnh viễn</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="device">Ghi chú</label>
+          <input id="device" class="input" type="text" placeholder="VD: Khách A - Zalo 0336...">
+        </div>
+        <div class="field">
+          <label for="quantity">Số lượng</label>
+          <select id="quantity" class="input">
+            <option value="1">1 Key</option>
+            <option value="5">5 Key</option>
+            <option value="10">10 Key</option>
+            <option value="20">20 Key</option>
+            <option value="50">50 Key</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" id="createBtn">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Tạo Key
+        </button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h">
+        <h3>Danh sách Key</h3>
+        <span class="count" id="listCount">0 key</span>
       </div>
       <div class="toolbar">
-        <div class="search-box">
-          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input type="text" id="searchInput" placeholder="Tìm kiếm theo key, ghi chú...">
+        <div class="search">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="searchInput" class="input" placeholder="Tìm theo key hoặc ghi chú">
         </div>
-        <select id="filterStatus" style="padding:10px 14px;background:var(--card);border:1px solid var(--border);
-          border-radius:10px;color:var(--text);font-size:13px;outline:none;font-family:inherit">
+        <select id="filterStatus" class="input">
           <option value="all">Tất cả trạng thái</option>
-          <option value="active">Đang hoạt động</option>
+          <option value="active">Hoạt động</option>
           <option value="locked">Đã khóa</option>
           <option value="expired">Hết hạn</option>
         </select>
       </div>
-      <div class="table-wrap">
+      <div class="tw">
         <table>
           <thead>
             <tr>
-              <th>Key</th>
-              <th>Ghi chú</th>
-              <th>Thời hạn</th>
-              <th>Hết hạn</th>
-              <th>Trạng thái</th>
-              <th style="text-align:right">Hành động</th>
+              <th>Key</th><th>Ghi chú</th><th>Thời hạn</th><th>Hết hạn</th><th>Trạng thái</th><th></th>
             </tr>
           </thead>
-          <tbody id="keyList">
-            <tr><td colspan="6">
-              <div class="empty">
-                <svg viewBox="0 0 24 24"><path d="M15 7a4 4 0 1 1-5.66 5.66L4 18v3h3l5.34-5.34A4 4 0 0 0 17 11"/></svg>
-                <h4>Chưa có Key nào</h4>
-                <p>Tạo Key đầu tiên bằng form phía trên</p>
-              </div>
-            </td></tr>
-          </tbody>
+          <tbody id="keyList"></tbody>
         </table>
       </div>
-    </div>
-
+    </section>
   </main>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
   const API_URL = '/.netlify/functions/keys';
-  let ADMIN_PASSWORD = '';
+  let ADMIN_PASSWORD = '732012';
   let keys = [];
 
   const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   function showToast(msg, type = 'success') {
     const t = $('#toast');
     t.textContent = msg;
     t.className = 'toast show ' + type;
     clearTimeout(t._timer);
-    t._timer = setTimeout(() => t.className = 'toast ' + type, 3000);
+    t._timer = setTimeout(() => t.className = 'toast ' + type, 2800);
   }
 
   async function callAPI(method, action = '', body = null) {
@@ -449,12 +286,13 @@
     return await res.json();
   }
 
-  // LOGIN
-  $('#loginBtn').onclick = async () => {
+  /* ---- LOGIN ---- */
+  async function login() {
     const pw = $('#password').value.trim();
     if (!pw) return;
-    $('#loginBtn').disabled = true;
-    $('#loginBtn').textContent = 'Đang đăng nhập...';
+    const btn = $('#loginBtn');
+    btn.disabled = true; btn.textContent = 'Đang đăng nhập...';
+    $('#loginError').classList.remove('show');
     ADMIN_PASSWORD = pw;
     try {
       const data = await callAPI('GET');
@@ -463,8 +301,8 @@
         $('#app').classList.add('show');
         keys = data.keys || [];
         renderKeys();
-        showToast('Đăng nhập thành công!', 'success');
       } else {
+        $('#loginError').textContent = 'Mật khẩu không chính xác';
         $('#loginError').classList.add('show');
         ADMIN_PASSWORD = '';
       }
@@ -473,13 +311,12 @@
       $('#loginError').classList.add('show');
       ADMIN_PASSWORD = '';
     } finally {
-      $('#loginBtn').disabled = false;
-      $('#loginBtn').textContent = 'Đăng nhập';
+      btn.disabled = false; btn.textContent = 'Đăng nhập';
     }
-  };
-  $('#password').addEventListener('keypress', e => { if (e.key === 'Enter') $('#loginBtn').click(); });
+  }
+  $('#loginForm').addEventListener('submit', login);
 
-  window.logout = function() {
+  window.logout = function () {
     $('#app').classList.remove('show');
     $('#loginScreen').classList.remove('hide');
     $('#password').value = '';
@@ -488,23 +325,34 @@
     keys = [];
   };
 
-  window.toggleSidebar = function() {
-    $('#sidebar').classList.toggle('open');
+  /* ---- LOAD ---- */
+  window.loadKeys = async function () {
+    try {
+      const data = await callAPI('GET');
+      if (data.status === 1) {
+        keys = data.keys || [];
+        renderKeys();
+        showToast('Đã làm mới');
+      } else {
+        showToast(data.msg || 'Lỗi tải dữ liệu', 'error');
+      }
+    } catch (e) {
+      showToast('Lỗi kết nối: ' + e.message, 'error');
+    }
   };
 
-  // CREATE KEY
+  /* ---- CREATE ---- */
   $('#createBtn').onclick = async () => {
     const duration = $('#duration').value;
     const device = $('#device').value.trim() || 'Chưa gán';
     const quantity = parseInt($('#quantity').value);
-
-    $('#createBtn').disabled = true;
-    $('#createBtn').textContent = 'Đang tạo...';
-
+    const btn = $('#createBtn');
+    const html = btn.innerHTML;
+    btn.disabled = true; btn.textContent = 'Đang tạo...';
     try {
       const data = await callAPI('POST', 'add', { duration, device, quantity });
       if (data.status === 1) {
-        showToast(`Đã tạo ${quantity} Key thành công!`, 'success');
+        showToast(`Đã tạo ${quantity} key`);
         keys = data.keys || [];
         renderKeys();
         $('#device').value = '';
@@ -514,64 +362,59 @@
     } catch (e) {
       showToast('Lỗi kết nối: ' + e.message, 'error');
     } finally {
-      $('#createBtn').disabled = false;
-      $('#createBtn').innerHTML = '<svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2"><path d="M12 5v14M5 12h14"/></svg> Tạo Key ngay';
+      btn.disabled = false; btn.innerHTML = html;
     }
   };
 
-  // DELETE KEY
-  window.deleteKey = async function(id) {
-    if (!confirm('Bạn có chắc muốn xóa Key này?\nHành động không thể hoàn tác.')) return;
+  /* ---- DELETE / TOGGLE / COPY ---- */
+  window.deleteKey = async function (id) {
+    if (!confirm('Xóa key này? Hành động không thể hoàn tác.')) return;
     try {
       const data = await callAPI('POST', 'delete', { id });
       if (data.status === 1) {
-        showToast('Đã xóa Key', 'success');
+        showToast('Đã xóa key');
         keys = data.keys || [];
         renderKeys();
-      } else {
-        showToast(data.msg || 'Lỗi xóa', 'error');
-      }
-    } catch (e) {
-      showToast('Lỗi: ' + e.message, 'error');
-    }
+      } else showToast(data.msg || 'Lỗi xóa', 'error');
+    } catch (e) { showToast('Lỗi: ' + e.message, 'error'); }
   };
 
-  // TOGGLE KEY
-  window.toggleKey = async function(id) {
+  window.toggleKey = async function (id) {
     try {
       const data = await callAPI('POST', 'toggle', { id });
       if (data.status === 1) {
-        const k = data.keys.find(x => x.id === id);
-        showToast(k && k.active ? 'Đã mở khóa Key' : 'Đã khóa Key', 'success');
+        const k = (data.keys || []).find(x => x.id === id);
+        showToast(k && k.active ? 'Đã mở khóa key' : 'Đã khóa key');
         keys = data.keys || [];
         renderKeys();
-      } else {
-        showToast(data.msg || 'Lỗi', 'error');
-      }
-    } catch (e) {
-      showToast('Lỗi: ' + e.message, 'error');
-    }
+      } else showToast(data.msg || 'Lỗi', 'error');
+    } catch (e) { showToast('Lỗi: ' + e.message, 'error'); }
   };
 
-  // COPY KEY
-  window.copyKey = function(key) {
-    navigator.clipboard.writeText(key).then(() => showToast('Đã sao chép Key!', 'success'));
+  window.copyKey = function (key) {
+    navigator.clipboard.writeText(key).then(() => showToast('Đã sao chép key'));
   };
 
-  // RENDER
+  /* ---- RENDER ---- */
+  const ICON = {
+    copy: '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
+    lock: '<svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+    unlock: '<svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>',
+    trash: '<svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>'
+  };
+
+  function getStatus(k) {
+    if (!k.active) return 'locked';
+    if (k.expires > 0 && Date.now() > k.expires) return 'expired';
+    return 'active';
+  }
+
   function renderKeys() {
-    const search = ($('#searchInput')?.value || '').toLowerCase().trim();
-    const filter = $('#filterStatus')?.value || 'all';
+    const search = ($('#searchInput').value || '').toLowerCase().trim();
+    const filter = $('#filterStatus').value || 'all';
 
-    const now = Date.now();
-    const getStatus = k => {
-      if (!k.active) return 'locked';
-      if (k.expires > 0 && now > k.expires) return 'expired';
-      return 'active';
-    };
-
-    let list = keys.filter(k => {
-      if (search && !(k.key.toLowerCase().includes(search) || (k.owner || '').toLowerCase().includes(search))) return false;
+    const list = keys.filter(k => {
+      if (search && !(String(k.key).toLowerCase().includes(search) || (k.owner || '').toLowerCase().includes(search))) return false;
       if (filter !== 'all' && getStatus(k) !== filter) return false;
       return true;
     });
@@ -580,61 +423,49 @@
     $('#statActive').textContent = keys.filter(k => getStatus(k) === 'active').length;
     $('#statLocked').textContent = keys.filter(k => getStatus(k) === 'locked').length;
     $('#statExpired').textContent = keys.filter(k => getStatus(k) === 'expired').length;
-    $('#listCount').textContent = list.length + ' KEY';
+    $('#listCount').textContent = list.length + ' key';
 
-    if (list.length === 0) {
-      $('#keyList').innerHTML = `
-        <tr><td colspan="6">
-          <div class="empty">
-            <svg viewBox="0 0 24 24"><path d="M15 7a4 4 0 1 1-5.66 5.66L4 18v3h3l5.34-5.34A4 4 0 0 0 17 11"/></svg>
-            <h4>${search || filter !== 'all' ? 'Không tìm thấy Key nào' : 'Chưa có Key nào'}</h4>
-            <p>${search || filter !== 'all' ? 'Thử thay đổi bộ lọc hoặc từ khóa' : 'Tạo Key đầu tiên bằng form phía trên'}</p>
-          </div>
-        </td></tr>`;
+    if (!list.length) {
+      const filtered = search || filter !== 'all';
+      $('#keyList').innerHTML = `<tr><td colspan="6"><div class="empty">
+        <b>${filtered ? 'Không tìm thấy key nào' : 'Chưa có key nào'}</b>
+        ${filtered ? 'Thử đổi từ khóa hoặc bộ lọc' : 'Tạo key đầu tiên ở form phía trên'}
+      </div></td></tr>`;
       return;
     }
 
-    $('#keyList').innerHTML = list.map(k => {
-      const status = getStatus(k);
-      const statusMap = {
-        active: { class: 'badge-active', text: 'Hoạt động' },
-        locked: { class: 'badge-locked', text: 'Đã khóa' },
-        expired: { class: 'badge-expired', text: 'Hết hạn' }
-      };
-      const s = statusMap[status];
-      const expText = k.expires === 0 ? '<span class="badge badge-lifetime">Vĩnh viễn</span>' 
-        : new Date(k.expires).toLocaleString('vi-VN', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-      const durText = k.duration === 0 ? 'Vĩnh viễn' : k.duration + ' ngày';
+    const labels = {
+      active: ['b-active', 'Hoạt động'],
+      locked: ['b-locked', 'Đã khóa'],
+      expired: ['b-expired', 'Hết hạn']
+    };
 
-      return `
-        <tr>
-          <td>
-            <span class="key-code" onclick="copyKey('${k.key}')" style="cursor:pointer" title="Bấm để sao chép">${k.key}</span>
-          </td>
-          <td style="color:var(--text-2);font-size:13px">${k.owner || 'Chưa gán'}</td>
-          <td style="color:var(--text-2);font-size:13px">${durText}</td>
-          <td style="color:var(--text-2);font-size:13px">${expText}</td>
-          <td><span class="badge ${s.class}">${s.text}</span></td>
-          <td>
-            <div class="action-btns" style="justify-content:flex-end">
-              <button class="icon-btn" onclick="toggleKey('${k.id}')" title="${k.active ? 'Khóa' : 'Mở khóa'}">
-                <svg viewBox="0 0 24 24">${k.active 
-                  ? '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'
-                  : '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>'}</svg>
-              </button>
-              <button class="icon-btn danger" onclick="deleteKey('${k.id}')" title="Xóa">
-                <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-              </button>
-            </div>
-          </td>
-        </tr>`;
+    $('#keyList').innerHTML = list.map(k => {
+      const st = getStatus(k);
+      const [cls, txt] = labels[st];
+      const exp = k.expires === 0
+        ? 'Vĩnh viễn'
+        : new Date(k.expires).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const dur = k.duration === 0 ? 'Vĩnh viễn' : k.duration + ' ngày';
+      const key = esc(k.key), id = esc(k.id);
+
+      return `<tr>
+        <td><button class="key" onclick="copyKey('${key}')" title="Sao chép">${key}${ICON.copy}</button></td>
+        <td class="sub"><div class="note">${esc(k.owner || 'Chưa gán')}</div></td>
+        <td class="sub">${dur}</td>
+        <td class="sub">${exp}</td>
+        <td><span class="badge ${cls}">${txt}</span></td>
+        <td><div class="acts">
+          <button class="ib" onclick="toggleKey('${id}')" title="${k.active ? 'Khóa' : 'Mở khóa'}">${k.active ? ICON.lock : ICON.unlock}</button>
+          <button class="ib del" onclick="deleteKey('${id}')" title="Xóa">${ICON.trash}</button>
+        </div></td>
+      </tr>`;
     }).join('');
   }
 
-  // SEARCH & FILTER
-  document.addEventListener('input', e => {
-    if (e.target.id === 'searchInput' || e.target.id === 'filterStatus') renderKeys();
-  });
+  $('#searchInput').addEventListener('input', renderKeys);
+  $('#filterStatus').addEventListener('change', renderKeys);
+  renderKeys();
 </script>
 </body>
 </html>
