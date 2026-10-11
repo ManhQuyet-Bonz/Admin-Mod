@@ -2,7 +2,12 @@ import { getStore } from "@netlify/blobs";
 
 const ADMIN_PASSWORD = "732012";
 
-async function readKeys(store) {
+const store = getStore({
+    name: "zephyris-keys",
+    consistency: "strong"
+});
+
+async function readKeys() {
     const data = await store.get("all", { type: "json" });
     return Array.isArray(data) ? data : [];
 }
@@ -23,13 +28,11 @@ export default async (request) => {
     const password = url.searchParams.get("password") || "";
     const action = url.searchParams.get("action") || "";
 
-    const store = getStore("zephyris-keys");
-
     if (action === "verify") {
         try {
             const body = await request.json();
             const keyInput = String(body.key || "").trim().toUpperCase();
-            const keys = await readKeys(store);
+            const keys = await readKeys();
             const found = keys.find(k => String(k.key || "").toUpperCase() === keyInput);
             if (!found) return new Response(JSON.stringify({ status: 0, msg: "Key không tồn tại" }), { status: 200, headers });
             if (found.active === false) return new Response(JSON.stringify({ status: 0, msg: "Key đã bị khóa" }), { status: 200, headers });
@@ -45,14 +48,14 @@ export default async (request) => {
     }
 
     if (request.method === "GET") {
-        const keys = await readKeys(store);
+        const keys = await readKeys();
         return new Response(JSON.stringify({ status: 1, keys }), { status: 200, headers });
     }
 
     if (request.method === "POST") {
         try {
             const body = await request.json();
-            let keys = await readKeys(store);
+            let keys = await readKeys();
 
             if (action === "add") {
                 const soLuong = Math.max(1, parseInt(body.quantity, 10) || 1);
