@@ -4,19 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zephyris Admin</title>
-
 <style>
-:root{
-    --bg:#09090b;
-    --panel:#121216;
-    --panel2:#18181d;
-    --line:#292930;
-    --text:#f4f4f6;
-    --mute:#8b8b96;
-    --red:#ff3b3b;
-    --red2:#c9141d;
-    --green:#36d995;
-}
+:root{--bg:#09090b;--panel:#121216;--panel2:#18181d;--line:#292930;--text:#f4f4f6;--mute:#8b8b96;--red:#ff3b3b;--red2:#c9141d;--green:#36d995}
 *{box-sizing:border-box;margin:0;padding:0;font-family:"Inter","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
 body{min-height:100vh;color:var(--text);background:radial-gradient(900px 400px at 50% -10%,rgba(255,59,59,.15),transparent 70%),var(--bg);-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit;color:inherit}
@@ -69,8 +58,6 @@ svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-l
 .info-value{font-size:12px;font-weight:600}
 .status{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:8px;font-size:11px;font-weight:600;white-space:nowrap}
 .status:before{content:"";width:6px;height:6px;border-radius:50%}
-.status.unused{color:#aaaab3;background:rgba(150,150,160,.08)}
-.status.unused:before{background:#777782}
 .status.active{color:var(--green);background:rgba(54,217,149,.09)}
 .status.active:before{background:var(--green)}
 .status.locked{color:#ff8080;background:rgba(255,59,59,.09)}
@@ -104,27 +91,15 @@ svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-l
 }
 </style>
 </head>
-
 <body>
 
 <section class="login" id="loginScreen">
     <div class="login-box">
-        <div class="mark">
-            <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
-        </div>
+        <div class="mark"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg></div>
         <h1>Zephyris Admin</h1>
         <p class="sub">Quản lý hệ thống Key</p>
-
-        <div class="input">
-            <label>Tài khoản</label>
-            <input id="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Nhập tài khoản">
-        </div>
-
-        <div class="input">
-            <label>Mật khẩu</label>
-            <input id="password" type="password" autocomplete="current-password" spellcheck="false" placeholder="Nhập mật khẩu">
-        </div>
-
+        <div class="input"><label>Tài khoản</label><input id="username" type="text" autocomplete="username" spellcheck="false" placeholder="Nhập tài khoản"></div>
+        <div class="input"><label>Mật khẩu</label><input id="password" type="password" autocomplete="current-password" spellcheck="false" placeholder="Nhập mật khẩu"></div>
         <button class="btn btn-primary" id="loginBtn">Đăng nhập</button>
         <div class="login-error" id="loginError">Tài khoản hoặc mật khẩu không chính xác</div>
     </div>
@@ -133,28 +108,20 @@ svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-l
 <div class="app" id="app">
     <header class="topbar">
         <div class="brand">
-            <div class="brand-mark">
-                <svg viewBox="0 0 24 24"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z"></path><path d="M9 12l2 2 4-4"></path></svg>
-            </div>
+            <div class="brand-mark"><svg viewBox="0 0 24 24"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z"></path><path d="M9 12l2 2 4-4"></path></svg></div>
             Zephyris Admin
         </div>
         <button class="logout" id="logoutBtn">Đăng xuất</button>
     </header>
 
     <main class="container">
-        <div class="header">
-            <h2>Quản lý Key</h2>
-            <p>Tạo và quản lý các Key kích hoạt</p>
-        </div>
+        <div class="header"><h2>Quản lý Key</h2><p>Tạo và quản lý các Key kích hoạt</p></div>
 
         <section class="create-card">
             <div class="create-title">
-                <div class="create-icon">
-                    <svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
-                </div>
+                <div class="create-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></div>
                 Tạo Key mới
             </div>
-
             <div class="form-grid">
                 <div class="field">
                     <label>Thời gian</label>
@@ -181,7 +148,6 @@ svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-l
                     </select>
                 </div>
             </div>
-
             <button class="btn btn-primary create-btn" id="createBtn">
                 <svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
                 Tạo Key
@@ -195,10 +161,7 @@ svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-l
         </section>
 
         <section class="list-card">
-            <div class="list-head">
-                <h3>Danh sách Key</h3>
-                <span class="list-count" id="listCount">0 Key</span>
-            </div>
+            <div class="list-head"><h3>Danh sách Key</h3><span class="list-count" id="listCount">0 Key</span></div>
             <div id="keyList"></div>
         </section>
     </main>
@@ -211,26 +174,10 @@ const ADMIN_USER = "Zephyris";
 const ADMIN_PASS = "732012";
 const API_URL = "/.netlify/functions/keys";
 
-const loginScreen = document.getElementById("loginScreen");
-const app = document.getElementById("app");
-const username = document.getElementById("username");
-const password = document.getElementById("password");
-const loginError = document.getElementById("loginError");
-const loginBtn = document.getElementById("loginBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const createBtn = document.getElementById("createBtn");
-const deviceInput = document.getElementById("device");
-const durationInput = document.getElementById("duration");
-const quantityInput = document.getElementById("quantity");
-const keyList = document.getElementById("keyList");
-const totalKeys = document.getElementById("totalKeys");
-const activeKeys = document.getElementById("activeKeys");
-const unusedKeys = document.getElementById("unusedKeys");
-const listCount = document.getElementById("listCount");
-const toast = document.getElementById("toast");
-
+const $ = id => document.getElementById(id);
 let keys = [];
 let toastTimeout;
+let isProcessing = false;
 
 async function goiAPI(action, body = null) {
     const url = API_URL + "?password=" + encodeURIComponent(ADMIN_PASS) + "&action=" + encodeURIComponent(action);
@@ -245,38 +192,37 @@ async function goiAPI(action, body = null) {
 }
 
 function showToast(message, type = "success") {
+    const toast = $("toast");
     toast.textContent = message;
     toast.className = "toast show " + type;
     clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(function () {
-        toast.className = "toast";
-    }, 2200);
+    toastTimeout = setTimeout(() => { toast.className = "toast"; }, 2200);
 }
 
 function login() {
-    const user = username.value.trim();
-    const pass = password.value;
+    const user = $("username").value.trim();
+    const pass = $("password").value;
     if (user === ADMIN_USER && pass === ADMIN_PASS) {
         sessionStorage.setItem("zephyris_login", "true");
-        loginScreen.style.display = "none";
-        app.style.display = "block";
-        loginError.style.display = "none";
+        $("loginScreen").style.display = "none";
+        $("app").style.display = "block";
+        $("loginError").style.display = "none";
         loadKeys();
     } else {
-        loginError.style.display = "block";
+        $("loginError").style.display = "block";
     }
 }
 
-loginBtn.addEventListener("click", login);
-password.addEventListener("keydown", function (e) { if (e.key === "Enter") login(); });
-username.addEventListener("keydown", function (e) { if (e.key === "Enter") password.focus(); });
+$("loginBtn").addEventListener("click", login);
+$("password").addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+$("username").addEventListener("keydown", e => { if (e.key === "Enter") $("password").focus(); });
 
-logoutBtn.addEventListener("click", function () {
+$("logoutBtn").addEventListener("click", () => {
     sessionStorage.removeItem("zephyris_login");
-    app.style.display = "none";
-    loginScreen.style.display = "flex";
-    username.value = "";
-    password.value = "";
+    $("app").style.display = "none";
+    $("loginScreen").style.display = "flex";
+    $("username").value = "";
+    $("password").value = "";
 });
 
 async function loadKeys() {
@@ -294,19 +240,25 @@ async function loadKeys() {
 }
 
 async function createKeys() {
-    const duration = Number(durationInput.value);
-    const device = deviceInput.value.trim() || "Chưa gán";
-    const quantity = Number(quantityInput.value);
+    if (isProcessing) return;
+    isProcessing = true;
 
-    createBtn.disabled = true;
-    createBtn.textContent = "Đang tạo...";
+    const duration = parseInt($("duration").value, 10);
+    const device = $("device").value.trim() || "Chưa gán";
+    const quantity = parseInt($("quantity").value, 10);
+
+    console.log("[CREATE] duration:", duration, "quantity:", quantity, "device:", device);
+
+    const btn = $("createBtn");
+    btn.disabled = true;
+    btn.textContent = "Đang tạo...";
 
     try {
         const data = await goiAPI("add", { duration, device, quantity });
         if (data.status === 1) {
             keys = data.keys || [];
             renderKeys();
-            deviceInput.value = "";
+            $("device").value = "";
             showToast(quantity > 1 ? "Đã tạo " + quantity + " Key" : "Đã tạo Key thành công");
         } else {
             showToast("Lỗi: " + (data.msg || "Không xác định"), "error");
@@ -314,12 +266,13 @@ async function createKeys() {
     } catch (e) {
         showToast("Lỗi: " + e.message, "error");
     } finally {
-        createBtn.disabled = false;
-        createBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg> Tạo Key';
+        btn.disabled = false;
+        btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg> Tạo Key';
+        isProcessing = false;
     }
 }
 
-createBtn.addEventListener("click", createKeys);
+$("createBtn").addEventListener("click", createKeys);
 
 function formatDuration(days) {
     if (days === 0) return "Vĩnh viễn";
@@ -330,32 +283,30 @@ function formatDuration(days) {
 
 function copyText(text) {
     if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(text).then(function () {
-            showToast("Đã copy Key");
-        }).catch(function () {
-            fallbackCopy(text);
-        });
+        navigator.clipboard.writeText(text).then(() => showToast("Đã copy Key")).catch(() => fallbackCopy(text));
         return;
     }
     fallbackCopy(text);
 }
 
 function fallbackCopy(text) {
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    textarea.style.position = "fixed";
-    textarea.style.left = "-9999px";
-    document.body.appendChild(textarea);
-    textarea.focus();
-    textarea.select();
-    let success = false;
-    try { success = document.execCommand("copy"); } catch (e) { success = false; }
-    document.body.removeChild(textarea);
-    showToast(success ? "Đã copy Key" : "Không thể copy", success ? "success" : "error");
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    showToast(ok ? "Đã copy Key" : "Không thể copy", ok ? "success" : "error");
 }
 
 async function deleteKey(id) {
+    if (isProcessing) return;
     if (!window.confirm("Bạn có chắc muốn xóa Key này?")) return;
+    isProcessing = true;
     try {
         const data = await goiAPI("delete", { id: String(id) });
         if (data.status === 1) {
@@ -367,34 +318,36 @@ async function deleteKey(id) {
         }
     } catch (e) {
         showToast("Lỗi: " + e.message, "error");
+    } finally {
+        isProcessing = false;
     }
 }
 
 async function toggleKey(id) {
+    if (isProcessing) return;
+    isProcessing = true;
     try {
         const data = await goiAPI("toggle", { id: String(id) });
         if (data.status === 1) {
             keys = data.keys || [];
             renderKeys();
-            const k = keys.find(function (x) { return String(x.id) === String(id); });
-            if (k) {
-                showToast(k.active === false ? "Đã khóa Key" : "Đã mở khóa Key");
-            } else {
-                showToast("Đã cập nhật");
-            }
+            const k = keys.find(x => String(x.id) === String(id));
+            showToast(k && k.active === false ? "Đã khóa Key" : "Đã mở khóa Key");
         } else {
             showToast("Lỗi: " + data.msg, "error");
         }
     } catch (e) {
         showToast("Lỗi: " + e.message, "error");
+    } finally {
+        isProcessing = false;
     }
 }
 
-function createElement(tag, className, text) {
-    const element = document.createElement(tag);
-    if (className) element.className = className;
-    if (text !== undefined) element.textContent = text;
-    return element;
+function el(tag, cls, txt) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (txt !== undefined) e.textContent = txt;
+    return e;
 }
 
 function getStatus(item) {
@@ -404,75 +357,69 @@ function getStatus(item) {
 }
 
 function renderKeys() {
-    keyList.innerHTML = "";
+    const list = $("keyList");
+    list.innerHTML = "";
 
-    const active = keys.filter(function (k) { return getStatus(k) === "active"; }).length;
+    const active = keys.filter(k => getStatus(k) === "active").length;
     const inactive = keys.length - active;
 
-    totalKeys.textContent = keys.length;
-    activeKeys.textContent = active;
-    unusedKeys.textContent = inactive;
-    listCount.textContent = keys.length + " Key";
+    $("totalKeys").textContent = keys.length;
+    $("activeKeys").textContent = active;
+    $("unusedKeys").textContent = inactive;
+    $("listCount").textContent = keys.length + " Key";
 
     if (keys.length === 0) {
-        const empty = createElement("div", "empty");
-        const icon = createElement("div", "empty-icon");
+        const empty = el("div", "empty");
+        const icon = el("div", "empty-icon");
         icon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>';
-        const text = createElement("p", "", "Chưa có Key nào");
         empty.appendChild(icon);
-        empty.appendChild(text);
-        keyList.appendChild(empty);
+        empty.appendChild(el("p", "", "Chưa có Key nào"));
+        list.appendChild(empty);
         return;
     }
 
-    keys.forEach(function (item) {
-        const row = createElement("div", "key-item");
+    keys.forEach(item => {
+        const row = el("div", "key-item");
 
-        const main = createElement("div", "key-main");
-        const code = createElement("div", "key-code", item.key || "(không có)");
-        const dev = createElement("div", "key-device", "Thiết bị: " + (item.owner || "Chưa gán"));
-        main.appendChild(code);
-        main.appendChild(dev);
+        const main = el("div", "key-main");
+        main.appendChild(el("div", "key-code", item.key || "(không có)"));
+        main.appendChild(el("div", "key-device", "Thiết bị: " + (item.owner || "Chưa gán")));
 
-        const time = createElement("div", "key-info");
-        const timeTitle = createElement("div", "info-title", "THỜI HẠN");
-        const timeValue = createElement("div", "info-value", formatDuration(Number(item.duration)));
-        time.appendChild(timeTitle);
-        time.appendChild(timeValue);
+        const time = el("div", "key-info");
+        time.appendChild(el("div", "info-title", "THỜI HẠN"));
+        time.appendChild(el("div", "info-value", formatDuration(Number(item.duration))));
 
-        const statusBox = createElement("div", "key-info");
-        const statusTitle = createElement("div", "info-title", "TRẠNG THÁI");
+        const statusBox = el("div", "key-info");
+        statusBox.appendChild(el("div", "info-title", "TRẠNG THÁI"));
         const st = getStatus(item);
-        const stMap = {
+        const map = {
             active: ["status active", "Hoạt động"],
             locked: ["status locked", "Đã khóa"],
             expired: ["status expired", "Hết hạn"]
         };
-        const status = createElement("span", stMap[st][0], stMap[st][1]);
-        statusBox.appendChild(statusTitle);
-        statusBox.appendChild(status);
+        statusBox.appendChild(el("span", map[st][0], map[st][1]));
 
-        const actions = createElement("div", "actions");
+        const actions = el("div", "actions");
 
-        const copyBtn = createElement("button", "action");
+        const copyBtn = el("button", "action");
         copyBtn.type = "button";
         copyBtn.title = "Copy Key";
         copyBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
-        copyBtn.addEventListener("click", function () { copyText(item.key); });
+        copyBtn.addEventListener("click", () => copyText(item.key));
 
-        const toggleBtn = createElement("button", "action toggle");
+        const toggleBtn = el("button", "action toggle");
         toggleBtn.type = "button";
         toggleBtn.title = item.active === false ? "Mở khóa" : "Khóa";
         toggleBtn.innerHTML = item.active === false
             ? '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>'
             : '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>';
-        toggleBtn.addEventListener("click", function () { toggleKey(item.id); });
+        toggleBtn.addEventListener("click", () => toggleKey(item.id));
 
-        const deleteBtn = createElement("button", "action delete");
+        const deleteBtn = el("button", "action delete");
         deleteBtn.type = "button";
         deleteBtn.title = "Xóa Key";
         deleteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 15H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>';
-        deleteBtn.addEventListener("click", function () { deleteKey(item.id); });
+        deleteBtn.addEventListener("click", () => deleteKey(item.id));
 
         actions.appendChild(copyBtn);
         actions.appendChild(toggleBtn);
@@ -483,14 +430,13 @@ function renderKeys() {
         row.appendChild(statusBox);
         row.appendChild(actions);
 
-        keyList.appendChild(row);
+        list.appendChild(row);
     });
 }
 
-// Tự động đăng nhập nếu đã login
 if (sessionStorage.getItem("zephyris_login") === "true") {
-    loginScreen.style.display = "none";
-    app.style.display = "block";
+    $("loginScreen").style.display = "none";
+    $("app").style.display = "block";
     loadKeys();
 }
 </script>
