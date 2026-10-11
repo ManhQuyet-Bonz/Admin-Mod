@@ -2,6 +2,11 @@ import { getStore } from "@netlify/blobs";
 
 const ADMIN_PASSWORD = "732012";
 
+async function readKeys(store) {
+    const data = await store.get("all", { type: "json" });
+    return Array.isArray(data) ? data : [];
+}
+
 export default async (request) => {
     const headers = {
         "Content-Type": "application/json",
@@ -19,36 +24,30 @@ export default async (request) => {
     const action = url.searchParams.get("action") || "";
 
     const store = getStore("zephyris-keys");
-    let keys = (await store.get("all", { type: "json" })) || [];
 
-    // ============ VERIFY (không cần password) ============
+    // VERIFY — không cần password
     if (action === "verify") {
         try {
             const body = await request.json();
-            const keyInput = (body.key || "").trim().toUpperCase();
-            const found = keys.find(k => (k.key || "").toUpperCase() === keyInput);
-            if (!found) {
-                return new Response(JSON.stringify({ status: 0, msg: "Key không tồn tại" }), { status: 200, headers });
-            }
-            if (found.active === false) {
-                return new Response(JSON.stringify({ status: 0, msg: "Key đã bị khóa" }), { status: 200, headers });
-            }
-            if (found.expires > 0 && Date.now() > found.expires) {
-                return new Response(JSON.stringify({ status: 0, msg: "Key đã hết hạn" }), { status: 200, headers });
-            }
+            const keyInput = String(body.key || "").trim().toUpperCase();
+            const keys = await readKeys(store);
+            const found = keys.find(k => String(k.key || "").toUpperCase() === keyInput);
+            if (!found) return new Response(JSON.stringify({ status: 0, msg: "Key không tồn tại" }), { status: 200, headers });
+            if (found.active === false) return new Response(JSON.stringify({ status: 0, msg: "Key đã bị khóa" }), { status: 200, headers });
+            if (found.expires > 0 && Date.now() > found.expires) return new Response(JSON.stringify({ status: 0, msg: "Key đã hết hạn" }), { status: 200, headers });
             return new Response(JSON.stringify({ status: 1, msg: "Hợp lệ", data: found }), { status: 200, headers });
         } catch (error) {
             return new Response(JSON.stringify({ status: 0, msg: "Lỗi: " + error.message }), { status: 200, headers });
         }
     }
 
-    // ============ CÁC ACTION KHÁC CẦN PASSWORD ============
+    // Các action khác cần password
     if (password !== ADMIN_PASSWORD) {
         return new Response(JSON.stringify({ status: 0, msg: "Mật khẩu sai" }), { status: 200, headers });
     }
 
-    // GET: lấy danh sách
     if (request.method === "GET") {
+        const keys = await readKeys(store);
         return new Response(JSON.stringify({ status: 1, keys }), { status: 200, headers });
     }
 
@@ -56,48 +55,79 @@ export default async (request) => {
         try {
             const body = await request.json();
 
-            if (action === "add") {
-                const soLuong = parseInt(body.quantity, 10) || 1;
-                const soNgay = parseInt(body.duration, 10) || 7;
-                for (let i = 0; i < soLuong; i++) {
-                    keys.unshift({
-                        id: "key_" + Date.now() + "_" + Math.random().toString(36).substring(2, 9),
-                        key: sinhKey(),
-                        owner: body.device || "Chưa gán",
-                        plan: "premium",
-                        duration: soNgay,
-                        expires: soNgay === 0 ? 0 : Date.now() + soNgay * 86400000,
-                        active: true,
-                        activated: false,
-                        created: new Date().toISOString()
-                    });
-                }
-            } 
-            else if (action === "delete") {
-                const targetId = String(body.id);
-                const before = keys.length;
-                keys = keys.filter(k => String(k.id) !== targetId);
-                if (keys.length === before) {
-                    return new Response(JSON.stringify({ status: 0, msg: "Không tìm thấy Key để xóa (id: " + targetId + ")" }), { status: 200, headers });
-                }
-            } 
-            else if (action === "toggle") {
-                const targetId = String(body.id);
-                let found = false;
-                keys = keys.map(k => {
-                    if (String(k.id) === targetId) {
-                        found = true;
-                        return { ...k, active: k.active === false ? true : false };
-                    }
-                    return k;
-                });
-                if (!found) {
-                    return new Response(JSON.stringify({ status: 0, msg: "Không tìm thấy Key (id: " + targetId + ")" }), { status: 200, headers });
-                }
+            // LOCK — tránh race condition
+            const lockKey = "lock_" + action;
+            const existingLock = await store.get(lockKey);
+            if (existingLock) {
+                return new Response(JSON.stringify({ status: 0, msg: "Đang xử lý, vui lòng thử lại" }), { status: 200, headers });
             }
+            await store.set(lockKey, "1");
 
-            await store.setJSON("all", keys);
-            return new Response(JSON.stringify({ status: 1, msg: "Thành công", keys }), { status: 200, headers });
+            try {
+                let keys = await readKeys(store);
+
+                if (action === "add") {
+                    const soLuong = Math.max(1, parseInt(body.quantity, 10) || 1);
+                    const soNgay = parseInt(body.duration, 10);
+                    const duration = isNaN(soNgay) ? 7 : soNgay;
+
+                    const newKeys = [];
+                    for (let i = 0; i < soLuong; i++) {
+                        newKeys.push({
+                            id: "key_" + Date.now() + "_" + i + "_" + Math.random().toString(36).substring(2, 9),
+                            key: sinhKey(),
+                            owner: body.device || "Chưa gán",
+                            plan: "premium",
+                            duration: duration,
+                            expires: duration === 0 ? 0 : Date.now() + duration * 86400000,
+                            active: true,
+                            activated: false,
+                            created: new Date().toISOString()
+                        });
+                    }
+                    keys = [...newKeys, ...keys];
+
+                } else if (action === "delete") {
+                    const targetId = String(body.id || "");
+                    if (!targetId) {
+                        await store.delete(lockKey);
+                        return new Response(JSON.stringify({ status: 0, msg: "Thiếu id" }), { status: 200, headers });
+                    }
+                    const before = keys.length;
+                    keys = keys.filter(k => String(k.id) !== targetId);
+                    if (keys.length === before) {
+                        await store.delete(lockKey);
+                        return new Response(JSON.stringify({ status: 0, msg: "Không tìm thấy Key (id: " + targetId + ")" }), { status: 200, headers });
+                    }
+
+                } else if (action === "toggle") {
+                    const targetId = String(body.id || "");
+                    if (!targetId) {
+                        await store.delete(lockKey);
+                        return new Response(JSON.stringify({ status: 0, msg: "Thiếu id" }), { status: 200, headers });
+                    }
+                    let found = false;
+                    keys = keys.map(k => {
+                        if (String(k.id) === targetId) {
+                            found = true;
+                            return { ...k, active: k.active === false ? true : false };
+                        }
+                        return k;
+                    });
+                    if (!found) {
+                        await store.delete(lockKey);
+                        return new Response(JSON.stringify({ status: 0, msg: "Không tìm thấy Key" }), { status: 200, headers });
+                    }
+                }
+
+                await store.setJSON("all", keys);
+                await store.delete(lockKey);
+
+                return new Response(JSON.stringify({ status: 1, msg: "Thành công", keys }), { status: 200, headers });
+            } catch (err) {
+                try { await store.delete(lockKey); } catch (e) {}
+                throw err;
+            }
         } catch (error) {
             return new Response(JSON.stringify({ status: 0, msg: "Lỗi: " + error.message }), { status: 200, headers });
         }
