@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zephyris Admin</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<section class="login" id="loginScreen">
+    <div class="login-box">
+        <div class="mark">
+            <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+        </div>
+        <h1>Zephyris Admin</h1>
+        <p class="sub">Quản lý hệ thống Key</p>
+        <div class="input">
+            <label>Mật khẩu Admin</label>
+            <input id="password" type="password" placeholder="Nhập mật khẩu">
+        </div>
+        <button class="btn btn-primary" id="loginBtn">Đăng nhập</button>
+        <div class="login-error" id="loginError">Mật khẩu không chính xác</div>
+    </div>
+</section>
+
+<div class="app" id="app">
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">
+                <svg viewBox="0 0 24 24"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z"></path><path d="M9 12l2 2 4-4"></path></svg>
+            </div>
+            Zephyris Admin
+        </div>
+        <button class="logout" id="logoutBtn">Đăng xuất</button>
+    </header>
+
+    <main class="container">
+        <div class="header">
+            <h2>Quản lý Key</h2>
+            <p>Tạo và quản lý các Key kích hoạt trên server</p>
+        </div>
+
+        <section class="create-card">
+            <div class="create-title">
+                <div class="create-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></div>
+                Tạo Key mới
+            </div>
+            <div class="form-grid">
+                <div class="field">
+                    <label>Thời gian</label>
+                    <select id="duration">
+                        <option value="1">1 ngày</option>
+                        <option value="7" selected>7 ngày</option>
+                        <option value="30">30 ngày</option>
+                        <option value="365">1 năm</option>
+                        <option value="0">Vĩnh viễn</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Mã thiết bị / Ghi chú</label>
+                    <input id="device" type="text" placeholder="Nhập ghi chú">
+                </div>
+                <div class="field">
+                    <label>Số lượng</label>
+                    <select id="quantity">
+                        <option value="1">1 Key</option>
+                        <option value="5">5 Key</option>
+                        <option value="10">10 Key</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-primary create-btn" id="createBtn">
+                <svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+                Tạo Key
+            </button>
+        </section>
+
+        <section class="stats">
+            <div class="stat"><div class="stat-name">TỔNG KEY</div><div class="stat-value" id="totalKeys">0</div></div>
+            <div class="stat"><div class="stat-name">ĐANG HOẠT ĐỘNG</div><div class="stat-value" id="activeKeys">0</div></div>
+            <div class="stat"><div class="stat-name">ĐÃ KHÓA</div><div class="stat-value" id="unusedKeys">0</div></div>
+        </section>
+
+        <section class="list-card">
+            <div class="list-head"><h3>Danh sách Key</h3><span class="list-count" id="listCount">0 Key</span></div>
+            <div id="keyList"></div>
+        </section>
+    </main>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="js/admin.js"></script>
+</body>
+</html>

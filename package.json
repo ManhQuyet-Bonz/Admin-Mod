@@ -1,0 +1,8 @@
+{
+  "name": "zephyris-mod",
+  "version": "2.0.0",
+  "type": "module",
+  "dependencies": {
+    "@netlify/blobs": "^7.0.0"
+  }
+}
