@@ -4,7 +4,85 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zephyris Admin</title>
-<link rel="stylesheet" href="css/style.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  body { background: #0f1117; color: #e4e6eb; min-height: 100vh; }
+  
+  /* LOGIN */
+  .login { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+  .login.hide { display: none; }
+  .login-box { background: #1a1d26; border: 1px solid #2a2e3a; border-radius: 16px; padding: 36px 28px; width: 100%; max-width: 380px; text-align: center; }
+  .mark { width: 56px; height: 56px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
+  .mark svg { width: 28px; height: 28px; stroke: #fff; fill: none; stroke-width: 2; }
+  .login-box h1 { font-size: 22px; margin-bottom: 6px; }
+  .sub { color: #8b8f9c; font-size: 14px; margin-bottom: 24px; }
+  .input { text-align: left; margin-bottom: 16px; }
+  .input label { font-size: 13px; color: #8b8f9c; display: block; margin-bottom: 6px; }
+  .input input, .field input, .field select { width: 100%; background: #0f1117; border: 1px solid #2a2e3a; border-radius: 10px; padding: 12px 14px; color: #e4e6eb; font-size: 14px; outline: none; }
+  .input input:focus, .field input:focus, .field select:focus { border-color: #6366f1; }
+  .login-error { color: #ef4444; font-size: 13px; margin-top: 12px; display: none; }
+  .login-error.show { display: block; }
+  
+  /* BUTTON */
+  .btn { border: none; border-radius: 10px; padding: 12px 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; width: 100%; }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+  
+  /* APP */
+  .app { display: none; }
+  .app.show { display: block; }
+  .topbar { background: #1a1d26; border-bottom: 1px solid #2a2e3a; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; }
+  .brand-mark { width: 34px; height: 34px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .brand-mark svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; }
+  .logout { background: transparent; border: 1px solid #2a2e3a; color: #8b8f9c; padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+  .logout:hover { border-color: #ef4444; color: #ef4444; }
+  
+  .container { max-width: 900px; margin: 0 auto; padding: 24px 20px; }
+  .header { margin-bottom: 24px; }
+  .header h2 { font-size: 24px; margin-bottom: 4px; }
+  .header p { color: #8b8f9c; font-size: 14px; }
+  
+  .create-card, .list-card { background: #1a1d26; border: 1px solid #2a2e3a; border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+  .create-title { display: flex; align-items: center; gap: 10px; font-weight: 600; margin-bottom: 18px; }
+  .create-icon { width: 30px; height: 30px; background: rgba(99, 102, 241, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .create-icon svg { width: 16px; height: 16px; stroke: #6366f1; fill: none; stroke-width: 2; }
+  
+  .form-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 16px; }
+  @media(min-width: 640px) { .form-grid { grid-template-columns: 1fr 1fr 1fr; } }
+  .field label { font-size: 13px; color: #8b8f9c; display: block; margin-bottom: 6px; }
+  .create-btn { width: 100%; }
+  
+  .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .stat { background: #1a1d26; border: 1px solid #2a2e3a; border-radius: 12px; padding: 16px; text-align: center; }
+  .stat-name { font-size: 11px; color: #8b8f9c; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .stat-value { font-size: 22px; font-weight: 700; color: #6366f1; }
+  
+  .list-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .list-head h3 { font-size: 16px; }
+  .list-count { font-size: 12px; color: #8b8f9c; background: #0f1117; padding: 4px 10px; border-radius: 20px; }
+  
+  .key-item { background: #0f1117; border: 1px solid #2a2e3a; border-radius: 10px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .key-info { flex: 1; min-width: 200px; }
+  .key-code { font-family: monospace; font-size: 14px; color: #a5b4fc; font-weight: 600; word-break: break-all; }
+  .key-meta { font-size: 12px; color: #8b8f9c; margin-top: 4px; }
+  .key-actions { display: flex; gap: 6px; align-items: center; }
+  .key-status { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 600; cursor: pointer; user-select: none; }
+  .status-active { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+  .status-locked { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+  .status-expired { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+  .btn-mini { background: transparent; border: 1px solid #2a2e3a; color: #8b8f9c; padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+  .btn-mini:hover { border-color: #ef4444; color: #ef4444; }
+  .empty { text-align: center; color: #8b8f9c; padding: 30px; font-size: 14px; }
+  
+  /* TOAST */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1a1d26; border: 1px solid #2a2e3a; color: #e4e6eb; padding: 12px 20px; border-radius: 10px; font-size: 14px; transition: all .3s; opacity: 0; z-index: 100; }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.success { border-color: #22c55e; }
+  .toast.error { border-color: #ef4444; }
+</style>
 </head>
 <body>
 
@@ -84,12 +162,194 @@
 
         <section class="list-card">
             <div class="list-head"><h3>Danh sách Key</h3><span class="list-count" id="listCount">0 Key</span></div>
-            <div id="keyList"></div>
+            <div id="keyList"><div class="empty">Chưa có Key nào</div></div>
         </section>
     </main>
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="js/admin.js"></script>
+
+<script>
+  // ============ CẤU HÌNH ============
+  const API_URL = "/.netlify/functions/keys";
+  let ADMIN_PASSWORD = ""; // sẽ được gán khi đăng nhập
+  let keys = [];
+
+  // ============ DOM ============
+  const loginScreen = document.getElementById('loginScreen');
+  const app = document.getElementById('app');
+  const passwordInput = document.getElementById('password');
+  const loginBtn = document.getElementById('loginBtn');
+  const loginError = document.getElementById('loginError');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const createBtn = document.getElementById('createBtn');
+  const keyList = document.getElementById('keyList');
+  const toast = document.getElementById('toast');
+
+  // ============ TOAST ============
+  function showToast(msg, type = 'success') {
+    toast.textContent = msg;
+    toast.className = 'toast show ' + type;
+    setTimeout(() => toast.className = 'toast ' + type, 2500);
+  }
+
+  // ============ GỌI API ============
+  async function callAPI(method, action = "", body = null) {
+    const url = `${API_URL}?password=${encodeURIComponent(ADMIN_PASSWORD)}&action=${action}`;
+    const options = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body) options.body = JSON.stringify(body);
+
+    const res = await fetch(url, options);
+    return await res.json();
+  }
+
+  // ============ ĐĂNG NHẬP ============
+  loginBtn.onclick = async () => {
+    const pw = passwordInput.value;
+    if (!pw) return;
+
+    // Thử gọi API với mật khẩu vừa nhập
+    ADMIN_PASSWORD = pw;
+    try {
+      const data = await callAPI('GET');
+      if (data.status === 1) {
+        loginScreen.classList.add('hide');
+        app.classList.add('show');
+        keys = data.keys || [];
+        renderKeys();
+        showToast('Đăng nhập thành công!', 'success');
+      } else {
+        loginError.classList.add('show');
+        ADMIN_PASSWORD = "";
+      }
+    } catch (err) {
+      showToast('Lỗi kết nối: ' + err.message, 'error');
+      ADMIN_PASSWORD = "";
+    }
+  };
+  passwordInput.addEventListener('keypress', e => { if (e.key === 'Enter') loginBtn.click(); });
+
+  // ============ ĐĂNG XUẤT ============
+  logoutBtn.onclick = () => {
+    app.classList.remove('show');
+    loginScreen.classList.remove('hide');
+    passwordInput.value = '';
+    loginError.classList.remove('show');
+    ADMIN_PASSWORD = "";
+    keys = [];
+  };
+
+  // ============ TẠO KEY ============
+  createBtn.onclick = async () => {
+    const duration = document.getElementById('duration').value;
+    const device = document.getElementById('device').value || 'Chưa gán';
+    const quantity = parseInt(document.getElementById('quantity').value);
+
+    createBtn.disabled = true;
+    createBtn.textContent = 'Đang tạo...';
+
+    try {
+      const data = await callAPI('POST', 'add', { duration, device, quantity });
+      if (data.status === 1) {
+        showToast(`Đã tạo ${quantity} Key thành công!`, 'success');
+        keys = data.keys || [];
+        renderKeys();
+        document.getElementById('device').value = '';
+      } else {
+        showToast('Lỗi: ' + (data.msg || 'Không xác định'), 'error');
+      }
+    } catch (err) {
+      showToast('Lỗi kết nối API: ' + err.message, 'error');
+    } finally {
+      createBtn.disabled = false;
+      createBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg> Tạo Key';
+    }
+  };
+
+  // ============ XÓA KEY ============
+  async function deleteKey(id) {
+    if (!confirm('Bạn có chắc muốn xóa Key này?')) return;
+    try {
+      const data = await callAPI('POST', 'delete', { id });
+      if (data.status === 1) {
+        showToast('Đã xóa Key', 'success');
+        keys = data.keys || [];
+        renderKeys();
+      } else {
+        showToast('Lỗi: ' + data.msg, 'error');
+      }
+    } catch (err) {
+      showToast('Lỗi: ' + err.message, 'error');
+    }
+  }
+
+  // ============ KHÓA / MỞ KHÓA KEY ============
+  async function toggleKey(id) {
+    try {
+      const data = await callAPI('POST', 'toggle', { id });
+      if (data.status === 1) {
+        showToast('Đã cập nhật trạng thái', 'success');
+        keys = data.keys || [];
+        renderKeys();
+      } else {
+        showToast('Lỗi: ' + data.msg, 'error');
+      }
+    } catch (err) {
+      showToast('Lỗi: ' + err.message, 'error');
+    }
+  }
+
+  // ============ HIỂN THỊ DANH SÁCH ============
+  function renderKeys() {
+    const total = keys.length;
+    const active = keys.filter(k => k.active && (k.expires === 0 || Date.now() < k.expires)).length;
+    const locked = keys.filter(k => !k.active).length;
+
+    document.getElementById('totalKeys').textContent = total;
+    document.getElementById('activeKeys').textContent = active;
+    document.getElementById('unusedKeys').textContent = locked;
+    document.getElementById('listCount').textContent = total + ' Key';
+
+    if (total === 0) {
+      keyList.innerHTML = '<div class="empty">Chưa có Key nào</div>';
+      return;
+    }
+
+    keyList.innerHTML = keys.map(k => {
+      let statusClass = 'status-active';
+      let statusText = 'Hoạt động';
+      if (!k.active) {
+        statusClass = 'status-locked';
+        statusText = 'Đã khóa';
+      } else if (k.expires > 0 && Date.now() > k.expires) {
+        statusClass = 'status-expired';
+        statusText = 'Hết hạn';
+      }
+
+      const expText = k.expires === 0 ? 'Vĩnh viễn' : new Date(k.expires).toLocaleString('vi-VN');
+
+      return `
+        <div class="key-item">
+          <div class="key-info">
+            <div class="key-code">${k.key}</div>
+            <div class="key-meta">
+              👤 ${k.owner || 'Chưa gán'} &nbsp;•&nbsp; 
+              ⏱ ${k.duration === 0 ? 'Vĩnh viễn' : k.duration + ' ngày'} &nbsp;•&nbsp; 
+              📅 Hết hạn: ${expText}
+            </div>
+          </div>
+          <div class="key-actions">
+            <span class="key-status ${statusClass}" onclick="toggleKey('${k.id}')" title="Bấm để khóa/mở">${statusText}</span>
+            <button class="btn-mini" onclick="deleteKey('${k.id}')">Xóa</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Gán hàm vào window để onclick trong HTML gọi được
+  window.deleteKey = deleteKey;
+  window.toggleKey = toggleKey;
+</script>
 </body>
 </html>
