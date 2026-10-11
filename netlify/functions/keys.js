@@ -21,15 +21,16 @@ export default async (request) => {
     const store = getStore("zephyris-keys");
     let keys = (await store.get("all", { type: "json" })) || [];
 
-    // ============ ACTION: verify (KHÔNG CẦN PASSWORD) ============
+    // ============ VERIFY (không cần password) ============
     if (action === "verify") {
         try {
             const body = await request.json();
-            const found = keys.find(k => k.key === body.key);
+            const keyInput = (body.key || "").trim().toUpperCase();
+            const found = keys.find(k => (k.key || "").toUpperCase() === keyInput);
             if (!found) {
                 return new Response(JSON.stringify({ status: 0, msg: "Key không tồn tại" }), { status: 200, headers });
             }
-            if (!found.active) {
+            if (found.active === false) {
                 return new Response(JSON.stringify({ status: 0, msg: "Key đã bị khóa" }), { status: 200, headers });
             }
             if (found.expires > 0 && Date.now() > found.expires) {
@@ -41,11 +42,12 @@ export default async (request) => {
         }
     }
 
-    // ============ CÁC ACTION CÒN LẠI: CẦN PASSWORD ============
+    // ============ CÁC ACTION KHÁC CẦN PASSWORD ============
     if (password !== ADMIN_PASSWORD) {
         return new Response(JSON.stringify({ status: 0, msg: "Mật khẩu sai" }), { status: 200, headers });
     }
 
+    // GET: lấy danh sách
     if (request.method === "GET") {
         return new Response(JSON.stringify({ status: 1, keys }), { status: 200, headers });
     }
@@ -57,10 +59,9 @@ export default async (request) => {
             if (action === "add") {
                 const soLuong = parseInt(body.quantity, 10) || 1;
                 const soNgay = parseInt(body.duration, 10) || 7;
-
                 for (let i = 0; i < soLuong; i++) {
                     keys.unshift({
-                        id: Date.now() + "-" + Math.random().toString(36).substring(2, 9),
+                        id: "key_" + Date.now() + "_" + Math.random().toString(36).substring(2, 9),
                         key: sinhKey(),
                         owner: body.device || "Chưa gán",
                         plan: "premium",
@@ -71,10 +72,28 @@ export default async (request) => {
                         created: new Date().toISOString()
                     });
                 }
-            } else if (action === "delete") {
-                keys = keys.filter(k => k.id !== body.id);
-            } else if (action === "toggle") {
-                keys = keys.map(k => k.id === body.id ? { ...k, active: !k.active } : k);
+            } 
+            else if (action === "delete") {
+                const targetId = String(body.id);
+                const before = keys.length;
+                keys = keys.filter(k => String(k.id) !== targetId);
+                if (keys.length === before) {
+                    return new Response(JSON.stringify({ status: 0, msg: "Không tìm thấy Key để xóa (id: " + targetId + ")" }), { status: 200, headers });
+                }
+            } 
+            else if (action === "toggle") {
+                const targetId = String(body.id);
+                let found = false;
+                keys = keys.map(k => {
+                    if (String(k.id) === targetId) {
+                        found = true;
+                        return { ...k, active: k.active === false ? true : false };
+                    }
+                    return k;
+                });
+                if (!found) {
+                    return new Response(JSON.stringify({ status: 0, msg: "Không tìm thấy Key (id: " + targetId + ")" }), { status: 200, headers });
+                }
             }
 
             await store.setJSON("all", keys);
